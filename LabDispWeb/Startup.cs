@@ -1,8 +1,10 @@
+using LabDispWeb.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,8 +18,11 @@ namespace LabDispWeb {
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+             .AddJsonOptions(options => options.SerializerSettings.ReferenceLoopHandling=Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            services.AddSingleton(Configuration);
+            services.AddDbContext<labdispmovilesContext>(option => { option.UseSqlServer(Configuration.GetConnectionString("LabDispMovilesDB")); });
+            services.AddScoped<DbContext, labdispmovilesContext>();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration => {
                 configuration.RootPath="ClientApp/dist";
